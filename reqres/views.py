@@ -24,6 +24,7 @@ def to_dictsim(x):
     return y
 #resobj = Searchres(hashtag='',time=0,positive=0,negative=0,postweet=[],negtweet=[],tweetcount=0)
 #detres = Detailed(hashtag='',poslist = [],neglist = [],postweet = [],negtweet = [],tweetcountl=0,dorm=0,countofdorm=0,label=[])
+#test for github
 resobj = Searchres(hashtag='',time=0,positive=0,negative=0,tweetcount=0)
 class ObjectEncoder(JSONEncoder):
     def default(self, o):

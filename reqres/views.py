@@ -25,7 +25,7 @@ def to_dictsim(x):
 #resobj = Searchres(hashtag='',time=0,positive=0,negative=0,postweet=[],negtweet=[],tweetcount=0)
 #detres = Detailed(hashtag='',poslist = [],neglist = [],postweet = [],negtweet = [],tweetcountl=0,dorm=0,countofdorm=0,label=[])
 #test for github
-resobj = Searchres(hashtag='',time=0,positive=0,negative=0,tweetcount=0)
+
 class ObjectEncoder(JSONEncoder):
     def default(self, o):
         return o.__dict__
@@ -134,6 +134,7 @@ def simpleanalysis(request):
 
         else:
             hashtag2 = '#' + hashtag1
+            resobj = Searchres(hashtag='', time=0, positive=0, negative=0, tweetcount=0)
             resobj.hashtag = hashtag1
             time = datetime.now()
             tweets = api.get_tweets(query=hashtag2, until =str(time.year)+'-'+str(time.month)+'-'+str(time.day) ,count=tweetcounting)
@@ -146,24 +147,21 @@ def simpleanalysis(request):
                 resobj.negative = 100 * len(ntweets) / len(tweets)
                 try:
                     resobj.postweet1 = ptweets[0]['status']
-                    resobj.postweet2 = ptweets[1]['status']
                     resobj.negtweet1 = ntweets[0]['status']
+                    resobj.postweet2 = ptweets[1]['status']
                     resobj.negtweet2 = ntweets[1]['status']
-                    print(ptweets[0]['status'],ntweets[0]['status'])
                 except:
                     pass
             resobj.time = to_integer(datetime.now())
             resobj.tweetcount = len(tweets)
             resobj.save()
-            print("helllo", len(tweets))
-            print(resobj)
             resobj1 = to_dictsim(resobj)
             return resobj1
 def index(request):
 
     print(request.GET['hashtag'])
     print(to_integer(datetime.now()))
-    resobj=''
+    res=''
     if request.method == 'GET':
         reqtype = 0
         try:reqtype = request.GET['type']
@@ -171,9 +169,9 @@ def index(request):
         if reqtype==1:
             pass #detailedanalysis(request)
         else:
-            resobj = simpleanalysis(request)
-    print(resobj)
-    response = HttpResponse(json.dumps(resobj))
+            res = simpleanalysis(request)
+    print(res)
+    response = HttpResponse(json.dumps(res))
     response['Access-Control-Allow-Origin'] = '*'
     response['Access-Control-Allow-Methods'] = 'GET'
     return response

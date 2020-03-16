@@ -146,12 +146,22 @@ def simpleanalysis(request):
                 ntweets = [tweet for tweet in tweets if tweet['sentiment'] == 'negative']
                 resobj.negative = 100 * len(ntweets) / len(tweets)
                 try:
-                    resobj.postweet1 = ptweets[0]['status']
-                    resobj.negtweet1 = ntweets[0]['status']
-                    resobj.postweet2 = ptweets[1]['status']
-                    resobj.negtweet2 = ntweets[1]['status']
+                    resobj.postweet1 = ptweets[len(ptweets)-1]['status']
                 except:
                     pass
+                try:
+                    resobj.negtweet1 = ntweets[len(ntweets) - 1]['status']
+                except:
+                    pass
+                try:
+                    resobj.postweet2 = ptweets[len(ptweets) - 2]['status']
+                except:
+                    pass
+                try:
+                    resobj.negtweet2 = ntweets[len(ntweets) - 2]['status']
+                except:
+                    pass
+
             resobj.time = to_integer(datetime.now())
             resobj.tweetcount = len(tweets)
             resobj.save()

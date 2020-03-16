@@ -30,21 +30,6 @@ class ObjectEncoder(JSONEncoder):
     def default(self, o):
         return o.__dict__
 
-class responsejson():
-    hashtag=''
-    tweetcount=0
-    label = []
-    positive=0
-    negetive=0
-    postweet=[]
-    negtweet=[]
-    poslist=[]
-    neglist=[]
-    dorm=0
-    countofdorm=0
-    tweetcountl=[]
-    time=0
-
 def to_integer(dt_time):
     return 1000000*dt_time.year + 10000*dt_time.month + 100*dt_time.day +  4*dt_time.hour +int(dt_time.minute/15)
 
@@ -152,8 +137,6 @@ def simpleanalysis(request):
             resobj.hashtag = hashtag1
             time = datetime.now()
             tweets = api.get_tweets(query=hashtag2, until =str(time.year)+'-'+str(time.month)+'-'+str(time.day) ,count=tweetcounting)
-            ptweets = []
-            ntweets = []
             resobj.positive=0
             resobj.negetive=0
             if len(tweets) > 0:
@@ -182,7 +165,9 @@ def index(request):
     print(to_integer(datetime.now()))
     resobj=''
     if request.method == 'GET':
-        reqtype = request.GET['type']
+        reqtype = 0
+        try:reqtype = request.GET['type']
+        except:pass
         if reqtype==1:
             pass #detailedanalysis(request)
         else:

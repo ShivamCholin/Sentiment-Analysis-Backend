@@ -17,9 +17,9 @@ analyser = SentimentIntensityAnalyzer()
 
 def sentiment_analyzer_scores(sentence):
     score = analyser.polarity_scores(sentence)
-    if score['compound']<=-0.05:
+    if score['compound']<=-0.01:
         return -1
-    if score['compound']>=0.05:
+    if score['compound']>=0.01:
         return 1
     else:
         return 0

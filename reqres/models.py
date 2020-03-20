@@ -12,12 +12,9 @@ class Searchres(models.Model):
 
 class Detailed(models.Model):
     hashtag = models.CharField(max_length=100)
-    poslist = [models.PositiveIntegerField(default=0)]
-    neglist = [models.PositiveIntegerField(default=0)]
-    postweet = [models.CharField(max_length=100)]
-    negtweet = [models.CharField(max_length=100)]
-    tweetcountl = [models.PositiveIntegerField(default=0)]
+    positive=models.FloatField(default=0)
+    negative=models.FloatField(default=0)
     dorm = models.PositiveIntegerField(default=0)
     countofdorm = models.PositiveIntegerField(default=0)
-    label = [models.CharField(max_length=100)]
-
+    tweetcount = models.IntegerField(default=1000)
+    time=models.PositiveIntegerField(default=0)

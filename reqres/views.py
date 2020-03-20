@@ -7,6 +7,7 @@ from json import JSONEncoder
 import json
 import re
 import tweepy
+from datetime import timedelta
 from tweepy import OAuthHandler
 from textblob import TextBlob
 from datetime import datetime
@@ -38,10 +39,31 @@ def to_dictsim(x):
 #resobj = Searchres(hashtag='',time=0,positive=0,negative=0,postweet=[],negtweet=[],tweetcount=0)
 #detres = Detailed(hashtag='',poslist = [],neglist = [],postweet = [],negtweet = [],tweetcountl=0,dorm=0,countofdorm=0,label=[])
 #test for github
-
-class ObjectEncoder(JSONEncoder):
-    def default(self, o):
-        return o.__dict__
+def monthret(x):
+    if x==1:
+        return 'jan'
+    if x==1:
+        return 'Feb'
+    if x==1:
+        return 'Mar'
+    if x==1:
+        return 'Apr'
+    if x==1:
+        return 'May'
+    if x==1:
+        return 'june'
+    if x==1:
+        return 'july'
+    if x==1:
+        return 'Aug'
+    if x==1:
+        return 'Sept'
+    if x==1:
+        return 'Oct'
+    if x==1:
+        return 'Nov'
+    if x==1:
+        return 'Dec'
 
 def to_integer(dt_time):
     return 1000000*dt_time.year + 10000*dt_time.month + 100*dt_time.day +  4*dt_time.hour +int(dt_time.minute/15)
@@ -71,7 +93,7 @@ class TwitterClient(object):
         x=p.clean(tweet)
         return x.replace('#', '')
 
-    def fetching_tweets(self, query,type=0, count=100):
+    def simfetching_tweets(self, query,type=0, count=100):
         msgs = []
         i=1
         if type == 0 :
@@ -85,21 +107,20 @@ class TwitterClient(object):
             return msgs
 
 
-    def get_tweets(self, query,type=0, count=100):
-        
+    def simget_tweets(self, query,type=0, count=100):
 
         tweets = []
 
         try:
 
-            fetched_tweets=self.fetching_tweets(query,type,count)
+            fetched_tweets=self.simfetching_tweets(query,type,count)
             for tweet in fetched_tweets:
 
                 parsed_tweet = {}
                 parsed_tweet['status'] = f'https://twitter.com/{tweet.user.screen_name}/status/{tweet.id}'
-                parsed_tweet['text'] = self.clean_tweet(tweet.text)
-                parsed_tweet['sentiment'] = sentiment_analyzer_scores(tweet.text)
-
+                y = self.clean_tweet(tweet.text)
+                parsed_tweet['text'] = y
+                parsed_tweet['sentiment'] = sentiment_analyzer_scores(y)
                 if tweet.retweet_count > 0:
                     if parsed_tweet not in tweets:
                         tweets.append(parsed_tweet)
@@ -111,7 +132,41 @@ class TwitterClient(object):
         except tweepy.TweepError as e:
             # print error (if any)
             print("Error : " + str(e))
+    def detfetching_tweets(self, query ,until,since ,type=0, count=100):
+        msgs = []
+        i=1
+        if type == 0 :
+            try:
+                for tweet in tweepy.Cursor(self.api.search,until =until,since =since, lang='en', count=100, q=query).items(count):
+                    print(i)
+                    i = i + 1
+                    msgs.append(tweet)
+            except:
+                pass
+            return msgs
 
+    def detget_tweets(self, query,until,since ,type=0, count=100):
+        tweets = []
+        try:
+            fetched_tweets = self.detfetching_tweets(query,until,since, type, count)
+            for tweet in fetched_tweets:
+
+                parsed_tweet = {}
+                parsed_tweet['status'] = f'https://twitter.com/{tweet.user.screen_name}/status/{tweet.id}'
+                y = self.clean_tweet(tweet.text)
+                parsed_tweet['text'] = y
+                parsed_tweet['sentiment'] = sentiment_analyzer_scores(y)
+                if tweet.retweet_count > 0:
+                    if parsed_tweet not in tweets:
+                        tweets.append(parsed_tweet)
+                else:
+                    tweets.append(parsed_tweet)
+
+            return tweets
+
+        except tweepy.TweepError as e:
+            # print error (if any)
+            print("Error : " + str(e))
 
 def simpleanalysis(request):
 
@@ -141,8 +196,7 @@ def simpleanalysis(request):
             hashtag2 = '#' + hashtag1
             resobj = Searchres(hashtag='', time=0, positive=0, negative=0, tweetcount=0)
             resobj.hashtag = hashtag1
-            time = datetime.now()
-            tweets = api.get_tweets(query=hashtag2 ,type=0, count=tweetcounting)
+            tweets = api.simget_tweets(query=hashtag2 ,type=0, count=tweetcounting)
             resobj.positive=0
             resobj.negetive=0
             if len(tweets) > 0:
@@ -172,6 +226,79 @@ def simpleanalysis(request):
             resobj.save()
             resobj1 = to_dictsim(resobj)
             return resobj1
+def detailedanalysis(request):
+    api = TwitterClient()
+    if request.method == 'GET':
+        hashtag1 = request.GET['hashtag']
+        hashtag2 = '#' + hashtag1
+        dorm = int(request.GET['dorm'])
+        countofdorm = 6
+        try:
+            countofdorm = int(request.GET['countofdorm'])
+        except:
+            pass
+        tweetcounting = 100
+        try:
+            tweetcounting = int(request.GET['tcount'])
+        except:
+            pass
+        resobj = Detailed(hashtag=hashtag1, time=to_integer(datetime.now()), tweetcount=tweetcounting, dorm=dorm,countofdorm=countofdorm,positive=0,negative=0)
+        tcountp=0
+        tcountn=0
+        ttcount=0
+        label = []
+        count = []
+        poslist = []
+        neglist = []
+        postweet = []
+        negtweet= []
+        if dorm == 0:
+            x = datetime.today()
+            for i in range(countofdorm):
+                edate = x - timedelta(days=i)
+                sdate = x - timedelta(days=i+1)
+                tweets = api.detget_tweets(query=hashtag2, type=0,until=edate.strftime('%Y-%m-%d'),since=sdate.strftime('%Y-%m-%d') ,count=tweetcounting)
+                positive = 0
+                negative = 0
+                if len(tweets) > 0:
+                    ptweets = [tweet for tweet in tweets if tweet['sentiment'] == 1]
+                    positive = 100 * len(ptweets) / len(tweets)
+                    ntweets = [tweet for tweet in tweets if tweet['sentiment'] == -1]
+                    negative = 100 * len(ntweets) / len(tweets)
+
+                label.append(edate.strftime('%m-%d'))
+                count.append(len(tweets))
+                poslist.append(positive)
+                neglist.append(negative)
+                ttcount+=len(tweets)
+                tcountp+=len(ptweets)
+                tcountn+=len(ntweets)
+                if i == 0:
+                    try:
+                        postweet.append(ptweets[len(ptweets) - 1]['status'])
+                    except:
+                        pass
+                    try:
+                        negtweet.append(ntweets[len(ntweets) - 1]['status'])
+                    except:
+                        pass
+                    try:
+                        postweet.append(ptweets[len(ptweets) - 2]['status'])
+                    except:
+                        pass
+                    try:
+                        negtweet.append(ntweets[len(ntweets) - 2]['status'])
+                    except:
+                        pass
+        if ttcount>0:
+            resobj.positive = 100 * tcountp / ttcount
+            resobj.negative = 100 * tcountn / ttcount
+            resobj.save()
+
+        return {"hashtage": hashtag1, 'positive': resobj.positive, 'negative': resobj.negative,
+             'tweetcount': ttcount, "time": resobj.time, "label":label , "count":count, "poslist":poslist, "neglist":neglist}
+
+
 def index(request):
 
     print(request.GET['hashtag'])
@@ -179,10 +306,10 @@ def index(request):
     res=''
     if request.method == 'GET':
         reqtype = 0
-        try:reqtype = request.GET['type']
+        try:reqtype = int(request.GET['type'])
         except:pass
         if reqtype==1:
-            pass #detailedanalysis(request)
+            res = detailedanalysis(request)
         else:
             res = simpleanalysis(request)
     print(res)

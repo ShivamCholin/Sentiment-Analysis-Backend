@@ -7,7 +7,7 @@ class SearchresAdmin(admin.ModelAdmin):
     list_display = ('hashtag','positive','negative','time')
 
 class DetailedResAdmin(admin.ModelAdmin):
-    list_display = ('hashtag','label')
+    list_display = ('hashtag','time','positive')
 
 admin.site.register(Searchres,SearchresAdmin)
 admin.site.register(Detailed,DetailedResAdmin)

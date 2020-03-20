@@ -266,7 +266,7 @@ def detailedanalysis(request):
                     ntweets = [tweet for tweet in tweets if tweet['sentiment'] == -1]
                     negative = 100 * len(ntweets) / len(tweets)
 
-                label.append(edate.strftime('%m-%d'))
+                label.append(edate.strftime('%d/%m'))
                 count.append(len(tweets))
                 poslist.append(positive)
                 neglist.append(negative)
@@ -296,7 +296,7 @@ def detailedanalysis(request):
             resobj.save()
 
         return {"hashtage": hashtag1, 'positive': resobj.positive, 'negative': resobj.negative,
-             'tweetcount': ttcount, "time": resobj.time, "label":label , "count":count, "poslist":poslist, "neglist":neglist}
+             'tweetcount': ttcount, "time": resobj.time, "label":label , "count":count, "poslist":poslist, "neglist":neglist , 'postweet':postweet, "negtweet":negtweet}
 
 
 def index(request):

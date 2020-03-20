@@ -76,7 +76,7 @@ class TwitterClient(object):
         i=1
         if type == 0 :
             try:
-                for tweet in tweepy.Cursor(self.api.search, lang='en', count=1000, q=query).items(count):
+                for tweet in tweepy.Cursor(self.api.search, lang='en', count=100, q=query).items(count):
                     print(i)
                     i = i + 1
                     msgs.append(tweet)

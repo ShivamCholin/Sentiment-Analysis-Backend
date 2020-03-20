@@ -10,6 +10,19 @@ import tweepy
 from tweepy import OAuthHandler
 from textblob import TextBlob
 from datetime import datetime
+import preprocessor as p
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+analyser = SentimentIntensityAnalyzer()
+
+
+def sentiment_analyzer_scores(sentence):
+    score = analyser.polarity_scores(sentence)
+    if score['compound']<=-0.05:
+        return -1
+    if score['compound']>=0.05:
+        return 1
+    else:
+        return 0
 def to_dictsim(x):
     l1=[]
     l2=[]
@@ -54,46 +67,38 @@ class TwitterClient(object):
             print("Error: Authentication Failed")
 
     def clean_tweet(self, tweet):
-        
-        return ' '.join(re.sub("(@[A-Za-z0-9]+)|([^0-9A-Za-z \t])| (\w+:\ / \ / \S+)", " ", tweet).split())
+        p.set_options(p.OPT.URL)
+        x=p.clean(tweet)
+        return x.replace('#', '')
 
-    def get_tweet_sentiment(self, tweet):
-        
-
-        analysis = TextBlob(self.clean_tweet(tweet))
-
-        if analysis.sentiment.polarity > 0:
-            return 'positive'
-        elif analysis.sentiment.polarity == 0:
-            return 'neutral'
-        else:
-            return 'negative'
-    def fetching_tweets(self, query,until,since, count=100):
+    def fetching_tweets(self, query,type=0, count=100):
         msgs = []
         i=1
-        try:
-            for tweet in tweepy.Cursor(self.api.search,lang='en', count=100, q=query, until=until,since=since).items(count):
-                print(i)
-                i=i+1
-                msgs.append(tweet)
-        except:
-            pass
-        return msgs
+        if type == 0 :
+            try:
+                for tweet in tweepy.Cursor(self.api.search, lang='en', count=1000, q=query).items(count):
+                    print(i)
+                    i = i + 1
+                    msgs.append(tweet)
+            except:
+                pass
+            return msgs
 
-    def get_tweets(self, query,until,since='2001-01-01', count=100):
+
+    def get_tweets(self, query,type=0, count=100):
         
 
         tweets = []
 
         try:
 
-            fetched_tweets=self.fetching_tweets(query,until,since,count)
+            fetched_tweets=self.fetching_tweets(query,type,count)
             for tweet in fetched_tweets:
 
                 parsed_tweet = {}
-                parsed_tweet['status'] = f"https://twitter.com/{tweet.user.screen_name}/status/{tweet.id}"
-                parsed_tweet['text'] = tweet.text
-                parsed_tweet['sentiment'] = self.get_tweet_sentiment(tweet.text)
+                parsed_tweet['status'] = f'https://twitter.com/{tweet.user.screen_name}/status/{tweet.id}'
+                parsed_tweet['text'] = self.clean_tweet(tweet.text)
+                parsed_tweet['sentiment'] = sentiment_analyzer_scores(tweet.text)
 
                 if tweet.retweet_count > 0:
                     if parsed_tweet not in tweets:
@@ -137,13 +142,13 @@ def simpleanalysis(request):
             resobj = Searchres(hashtag='', time=0, positive=0, negative=0, tweetcount=0)
             resobj.hashtag = hashtag1
             time = datetime.now()
-            tweets = api.get_tweets(query=hashtag2, until =str(time.year)+'-'+str(time.month)+'-'+str(time.day) ,count=tweetcounting)
+            tweets = api.get_tweets(query=hashtag2 ,type=0, count=tweetcounting)
             resobj.positive=0
             resobj.negetive=0
             if len(tweets) > 0:
-                ptweets = [tweet for tweet in tweets if tweet['sentiment'] == 'positive']
+                ptweets = [tweet for tweet in tweets if tweet['sentiment'] == 1]
                 resobj.positive = 100 * len(ptweets) / len(tweets)
-                ntweets = [tweet for tweet in tweets if tweet['sentiment'] == 'negative']
+                ntweets = [tweet for tweet in tweets if tweet['sentiment'] == -1]
                 resobj.negative = 100 * len(ntweets) / len(tweets)
                 try:
                     resobj.postweet1 = ptweets[len(ptweets)-1]['status']

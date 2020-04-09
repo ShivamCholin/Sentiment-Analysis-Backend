@@ -411,7 +411,6 @@ def index(request):
             res = detailedanalysis(request)
         else:
             res = simpleanalysis(request)
-            print(res)
     response = HttpResponse(json.dumps(res))
     response['Access-Control-Allow-Origin'] = '*'
     response['Access-Control-Allow-Methods'] = 'GET'

@@ -62,7 +62,7 @@ def to_dictsim(x):
         l1.append(x.negtweet2)
     except:
         pass
-    y = { "hashtag": x.hashtag, 'positive':x.positive,'negative':x.negative,'negtweet':l1,'postweet':l2,'tweetcount':x.tweetcount,"time":x.time}
+    y = {"hashtag": x.hashtag, 'positive':x.positive,'negative':x.negative,'negtweet':l1,'postweet':l2,'tweetcount':x.tweetcount,"time":x.time,"poswc":x.poswc}
     return y
 #resobj = Searchres(hashtag='',time=0,positive=0,negative=0,postweet=[],negtweet=[],tweetcount=0)
 #detres = Detailed(hashtag='',poslist = [],neglist = [],postweet = [],negtweet = [],tweetcountl=0,dorm=0,countofdorm=0,label=[])
@@ -248,9 +248,7 @@ def simpleanalysis(request):
             resobj.tweetcount = len(tweets)
             resobj.poswc=wordcloud
             resobj.save()
-            resobj1 = to_dictsim(resobj)
-            resobj1["wordcloud"]=wordcloud
-            return resobj1,
+            return to_dictsim(resobj)
 def detailedanalysis(request):
     api = TwitterClient()
     if request.method == 'GET':
@@ -391,7 +389,7 @@ def detailedanalysis(request):
             resobj.positive = 100 * tcountp / ttcount
             resobj.negative = 100 * tcountn / ttcount
             resobj.save()
-            return {"hashtage": hashtag1, 'positive': resobj.positive, 'negative': resobj.negative,
+            return {"hashtag": hashtag1, 'positive': resobj.positive, 'negative': resobj.negative,
             'tweetcount': ttcount, "time": resobj.time, "label": label, "count": count, "poslist": poslist,
             "neglist": neglist, 'postweet': postweet, "negtweet": negtweet, "ptweet": tcountp, "ntweet": tcountn}
 
@@ -413,6 +411,7 @@ def index(request):
             res = detailedanalysis(request)
         else:
             res = simpleanalysis(request)
+            print(res)
     response = HttpResponse(json.dumps(res))
     response['Access-Control-Allow-Origin'] = '*'
     response['Access-Control-Allow-Methods'] = 'GET'

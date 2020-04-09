@@ -8,10 +8,33 @@ from tweepy import OAuthHandler
 from datetime import datetime
 import preprocessor as p
 import GetOldTweets3 as got
+from wordcloud import WordCloud, STOPWORDS, ImageColorGenerator
+from PIL import Image
+from os import path
+import numpy as np # linear algebra
+import pandas as pd
+import matplotlib as mpl
+import urllib
+import matplotlib.pyplot as plt
+import io
+import base64
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 analyser = SentimentIntensityAnalyzer()
 
+def word_cloud(text):
+    wc = WordCloud(width = 512, height = 512,background_color='white', max_words=2000,)
+    wc = wc.generate(text)
+    plt.figure(figsize=(12,12))
+    plt.imshow(wc, interpolation='bilinear')
+    plt.axis("off")
 
+    image = io.BytesIO()
+    plt.savefig(image, format='png')
+    image.seek(0)  # rewind the data
+    string = base64.b64encode(image.read())
+
+    image_64 = 'data:image/png;base64,' + urllib.parse.quote(string)
+    return image_64
 def sentiment_analyzer_scores(sentence):
     score = analyser.polarity_scores(sentence)
     if score['compound']<=-0.01:
@@ -107,7 +130,7 @@ class TwitterClient(object):
     def simget_tweets(self, query,type=0, count=100):
 
         tweets = []
-
+        allset=''
         try:
 
             fetched_tweets=self.simfetching_tweets(query,type,count)
@@ -118,13 +141,14 @@ class TwitterClient(object):
                 y = clean_tweet(tweet.text)
                 parsed_tweet['text'] = y
                 parsed_tweet['sentiment'] = sentiment_analyzer_scores(y)
+                allset = allset + y + ' '
                 if tweet.retweet_count > 0:
                     if parsed_tweet not in tweets:
                         tweets.append(parsed_tweet)
                 else:
                     tweets.append(parsed_tweet)
-
-            return tweets
+            wordcloud1 = word_cloud(allset)
+            return tweets,wordcloud1
 
         except tweepy.TweepError as e:
             # print error (if any)
@@ -192,7 +216,7 @@ def simpleanalysis(request):
             hashtag2 = '#' + hashtag1
             resobj = Searchres(hashtag='', time=0, positive=0, negative=0, tweetcount=0)
             resobj.hashtag = hashtag1
-            tweets = api.simget_tweets(query=hashtag2 ,type=0, count=tweetcounting)
+            tweets,wordcloud = api.simget_tweets(query=hashtag2 ,type=0, count=tweetcounting)
             resobj.positive=0
             resobj.negetive=0
             if len(tweets) > 0:
@@ -216,12 +240,13 @@ def simpleanalysis(request):
                     resobj.negtweet2 = ntweets[len(ntweets) - 2]['status']
                 except:
                     pass
-
             resobj.time = to_integer(datetime.now())
             resobj.tweetcount = len(tweets)
+            resobj.poswc=wordcloud
             resobj.save()
             resobj1 = to_dictsim(resobj)
-            return resobj1
+            resobj1["wordcloud"]=wordcloud
+            return resobj1,
 def detailedanalysis(request):
     api = TwitterClient()
     if request.method == 'GET':
@@ -256,6 +281,7 @@ def detailedanalysis(request):
                 tweets = api.detget_tweets(query=hashtag2, type=0,until=edate.strftime('%Y-%m-%d'),since=sdate.strftime('%Y-%m-%d') ,count=tweetcounting)
                 positive = 0
                 negative = 0
+                pz=0
                 if len(tweets) > 0:
                     ptweets = [tweet for tweet in tweets if tweet['sentiment'] == 1]
                     px=len(ptweets)
@@ -383,7 +409,6 @@ def index(request):
             res = detailedanalysis(request)
         else:
             res = simpleanalysis(request)
-    print(res)
     response = HttpResponse(json.dumps(res))
     response['Access-Control-Allow-Origin'] = '*'
     response['Access-Control-Allow-Methods'] = 'GET'

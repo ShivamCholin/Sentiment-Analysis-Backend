@@ -1,4 +1,6 @@
 from django.db import models
+from django.core.files.storage import FileSystemStorage
+fs = FileSystemStorage(location='/media/photos')
 class Searchres(models.Model):
     hashtag=models.CharField(max_length=100)
     positive=models.FloatField(default=0)
@@ -9,6 +11,8 @@ class Searchres(models.Model):
     negtweet2 = models.CharField(max_length=1000, default='')
     tweetcount=models.IntegerField(default=1000)
     time=models.PositiveIntegerField(default=0)
+    poswc = models.CharField(max_length=10000000, default='')
+    negwc = models.CharField(max_length=10000000, default='')
 
 class Detailed(models.Model):
     hashtag = models.CharField(max_length=100)

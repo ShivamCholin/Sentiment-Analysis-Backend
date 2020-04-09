@@ -22,19 +22,23 @@ from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 analyser = SentimentIntensityAnalyzer()
 
 def word_cloud(text):
-    wc = WordCloud(width = 512, height = 512,background_color='white', max_words=2000,)
-    wc = wc.generate(text)
-    plt.figure(figsize=(12,12))
-    plt.imshow(wc, interpolation='bilinear')
-    plt.axis("off")
+    try:
+        wc = WordCloud(width=512, height=512, background_color='white', max_words=2000, )
+        wc = wc.generate(text)
+        plt.figure(figsize=(12, 12))
+        plt.imshow(wc, interpolation='bilinear')
+        plt.axis("off")
 
-    image = io.BytesIO()
-    plt.savefig(image, format='png')
-    image.seek(0)  # rewind the data
-    string = base64.b64encode(image.read())
+        image = io.BytesIO()
+        plt.savefig(image, format='png')
+        image.seek(0)  # rewind the data
+        string = base64.b64encode(image.read())
 
-    image_64 = 'data:image/png;base64,' + urllib.parse.quote(string)
-    return image_64
+        image_64 = 'data:image/png;base64,' + urllib.parse.quote(string)
+        return image_64
+    except:
+        pass
+
 def sentiment_analyzer_scores(sentence):
     score = analyser.polarity_scores(sentence)
     if score['compound']<=-0.01:

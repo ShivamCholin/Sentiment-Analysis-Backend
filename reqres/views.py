@@ -25,11 +25,10 @@ def word_cloud(text):
     try:
         wc = WordCloud(width=1600, height=800,random_state=1, max_words=100,colormap="Paired", background_color='black',)
         wc = wc.generate(text)
-        plt.figure(figsize=(20, 10))
+        plt.figure(figsize=(10,5))
         plt.imshow(wc, interpolation='bilinear')
         plt.axis("off")
-        plt.title("Top words - tweets", fontsize=20, color='black')
-        plt.tight_layout(pad=10)
+        plt.tight_layout(pad=0)
         image = io.BytesIO()
         plt.savefig(image, format='png')
         image.seek(0)  # rewind the data

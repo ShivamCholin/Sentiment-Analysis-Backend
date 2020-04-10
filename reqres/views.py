@@ -23,12 +23,13 @@ analyser = SentimentIntensityAnalyzer()
 
 def word_cloud(text):
     try:
-        wc = WordCloud(width=512, height=512, background_color='white', max_words=2000, )
+        wc = WordCloud(width=1600, height=800,random_state=1, max_words=100,colormap="Paired", background_color='black',)
         wc = wc.generate(text)
-        plt.figure(figsize=(12, 12))
+        plt.figure(figsize=(20, 10))
         plt.imshow(wc, interpolation='bilinear')
         plt.axis("off")
-
+        plt.title("Top words - tweets", fontsize=20, color='black')
+        plt.tight_layout(pad=10)
         image = io.BytesIO()
         plt.savefig(image, format='png')
         image.seek(0)  # rewind the data
@@ -62,7 +63,7 @@ def to_dictsim(x):
         l1.append(x.negtweet2)
     except:
         pass
-    y = {"hashtag": x.hashtag, 'positive':x.positive,'negative':x.negative,'negtweet':l1,'postweet':l2,'tweetcount':x.tweetcount,"time":x.time,"poswc":x.poswc}
+    y = {"hashtag": x.hashtag, 'positive':x.positive,'negative':x.negative,'negtweet':l1,'postweet':l2,'tweetcount':x.tweetcount,"time":x.time,"poswc":x.poswc,"negwc":x.negwc}
     return y
 #resobj = Searchres(hashtag='',time=0,positive=0,negative=0,postweet=[],negtweet=[],tweetcount=0)
 #detres = Detailed(hashtag='',poslist = [],neglist = [],postweet = [],negtweet = [],tweetcountl=0,dorm=0,countofdorm=0,label=[])
@@ -134,7 +135,6 @@ class TwitterClient(object):
     def simget_tweets(self, query,type=0, count=100):
 
         tweets = []
-        allset=''
         try:
 
             fetched_tweets=self.simfetching_tweets(query,type,count)
@@ -145,14 +145,12 @@ class TwitterClient(object):
                 y = clean_tweet(tweet.text)
                 parsed_tweet['text'] = y
                 parsed_tweet['sentiment'] = sentiment_analyzer_scores(y)
-                allset = allset + y + ' '
                 if tweet.retweet_count > 0:
                     if parsed_tweet not in tweets:
                         tweets.append(parsed_tweet)
                 else:
                     tweets.append(parsed_tweet)
-            wordcloud1 = word_cloud(allset)
-            return tweets,wordcloud1
+            return tweets
 
         except tweepy.TweepError as e:
             # print error (if any)
@@ -220,14 +218,28 @@ def simpleanalysis(request):
             hashtag2 = '#' + hashtag1
             resobj = Searchres(hashtag='', time=0, positive=0, negative=0, tweetcount=0)
             resobj.hashtag = hashtag1
-            tweets,wordcloud = api.simget_tweets(query=hashtag2 ,type=0, count=tweetcounting)
+            tweets = api.simget_tweets(query=hashtag2 ,type=0, count=tweetcounting)
             resobj.positive=0
             resobj.negetive=0
             if len(tweets) > 0:
-                ptweets = [tweet for tweet in tweets if tweet['sentiment'] == 1]
+                ptweets=[]
+                ptext=''
+                for tweet in tweets:
+                    if tweet['sentiment']==1:
+                        ptweets.append(tweet)
+                        ptext = ptext + " " + tweet['text']
+                ntweets = []
+                ntext = ''
+                for tweet in tweets:
+                    if tweet['sentiment'] == 1:
+                        ntweets.append(tweet)
+                        ntext = ntext + " " + tweet['text']
+                #ptweets = [tweet for tweet in tweets if tweet['sentiment'] == 1]
                 resobj.positive = 100 * len(ptweets) / len(tweets)
-                ntweets = [tweet for tweet in tweets if tweet['sentiment'] == -1]
+                #ntweets = [tweet for tweet in tweets if tweet['sentiment'] == -1]
                 resobj.negative = 100 * len(ntweets) / len(tweets)
+                resobj.poswc = word_cloud(ptext)
+                resobj.negwc = word_cloud(ntext)
                 try:
                     resobj.postweet1 = ptweets[len(ptweets)-1]['status']
                 except:
@@ -246,7 +258,6 @@ def simpleanalysis(request):
                     pass
             resobj.time = to_integer(datetime.now())
             resobj.tweetcount = len(tweets)
-            resobj.poswc=wordcloud
             resobj.save()
             return to_dictsim(resobj)
 def detailedanalysis(request):

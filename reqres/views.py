@@ -224,13 +224,13 @@ def simpleanalysis(request):
                 ptweets=[]
                 ptext=''
                 for tweet in tweets:
-                    if tweet['sentiment']==1:
+                    if tweet['sentiment'] == 1:
                         ptweets.append(tweet)
                         ptext = ptext + " " + tweet['text']
                 ntweets = []
                 ntext = ''
                 for tweet in tweets:
-                    if tweet['sentiment'] == 1:
+                    if tweet['sentiment'] == -1:
                         ntweets.append(tweet)
                         ntext = ntext + " " + tweet['text']
                 #ptweets = [tweet for tweet in tweets if tweet['sentiment'] == 1]

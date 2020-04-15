@@ -22,3 +22,5 @@ class Detailed(models.Model):
     countofdorm = models.PositiveIntegerField(default=0)
     tweetcount = models.IntegerField(default=1000)
     time=models.PositiveIntegerField(default=0)
+    poswc = models.CharField(max_length=10000000, default='')
+    negwc = models.CharField(max_length=10000000, default='')

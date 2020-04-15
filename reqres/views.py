@@ -8,12 +8,7 @@ from tweepy import OAuthHandler
 from datetime import datetime
 import preprocessor as p
 import GetOldTweets3 as got
-from wordcloud import WordCloud, STOPWORDS, ImageColorGenerator
-from PIL import Image
-from os import path
-import numpy as np # linear algebra
-import pandas as pd
-import matplotlib as mpl
+from wordcloud import WordCloud
 import urllib
 import matplotlib.pyplot as plt
 import io
@@ -57,8 +52,17 @@ def to_dictsim(x):
     l2=[]
     try:
         l2.append(x.postweet1)
+    except:
+        pass
+    try:
         l1.append(x.negtweet1)
+    except:
+        pass
+    try:
         l2.append(x.postweet2)
+    except:
+        pass
+    try:
         l1.append(x.negtweet2)
     except:
         pass
@@ -285,6 +289,8 @@ def detailedanalysis(request):
         neglist = []
         postweet = []
         negtweet= []
+        ntext = ''
+        ptext = ''
         if dorm == 0:
             x = datetime.today()
             for key in range(countofdorm):
@@ -295,13 +301,21 @@ def detailedanalysis(request):
                 negative = 0
                 pz=0
                 if len(tweets) > 0:
-                    ptweets = [tweet for tweet in tweets if tweet['sentiment'] == 1]
+                    ptweets=[]
+                    for tweet in tweets:
+                        if tweet['sentiment'] == 1:
+                            ptweets.append(tweet)
+                            ptext = ptext + " " + tweet['text']
+                    ntweets = []
+                    for tweet in tweets:
+                        if tweet['sentiment'] == -1:
+                            ntweets.append(tweet)
+                            ntext = ntext + " " + tweet['text']
                     px=len(ptweets)
                     py=len(tweets)
                     positive = 100 * px/py
                     ttcount += py
                     tcountp += px
-                    ntweets = [tweet for tweet in tweets if tweet['sentiment'] == -1]
                     pz=len(ntweets)
                     negative = 100 * pz/py
                 label.append(str(edate.strftime('%d'))+"/"+ str(monthret(int(edate.strftime('%m')))))
@@ -355,8 +369,8 @@ def detailedanalysis(request):
                         parsed_tweet = {}
                         parsed_tweet['status'] = f'https://twitter.com/{tweet.username}/status/{tweet.id}'
                         y = clean_tweet(tweet.text)
-                        parsed_tweet['text'] = tweet.text
-                        parsed_tweet['sentiment'] = sentiment_analyzer_scores(clean_tweet(tweet.text))
+                        parsed_tweet['text'] = y
+                        parsed_tweet['sentiment'] = sentiment_analyzer_scores(y)
                         if tweet.retweets > 0:
                             if parsed_tweet not in tweets:
                                 tweets.append(parsed_tweet)
@@ -365,9 +379,17 @@ def detailedanalysis(request):
                     positive = 0
                     negative = 0
                     if len(tweets) > 0:
-                        ptweets = [tweet for tweet in tweets if tweet['sentiment'] == 1]
+                        ptweets = []
+                        for tweet in tweets:
+                            if tweet['sentiment'] == 1:
+                                ptweets.append(tweet)
+                                ptext = ptext + " " + tweet['text']
+                        ntweets = []
+                        for tweet in tweets:
+                            if tweet['sentiment'] == -1:
+                                ntweets.append(tweet)
+                                ntext = ntext + " " + tweet['text']
                         positive = 100 * len(ptweets) / len(tweets)
-                        ntweets = [tweet for tweet in tweets if tweet['sentiment'] == -1]
                         negative = 100 * len(ntweets) / len(tweets)
                     label.append(str(monthret(month1)) + "/" + str(year1))
                     count.append(len(tweets))
@@ -398,15 +420,12 @@ def detailedanalysis(request):
         if ttcount > 0:
             resobj.positive = 100 * tcountp / ttcount
             resobj.negative = 100 * tcountn / ttcount
+            resobj.poswc = word_cloud(ptext)
+            resobj.negwc = word_cloud(ntext)
             resobj.save()
             return {"hashtag": hashtag1, 'positive': resobj.positive, 'negative': resobj.negative,
             'tweetcount': ttcount, "time": resobj.time, "label": label, "count": count, "poslist": poslist,
-            "neglist": neglist, 'postweet': postweet, "negtweet": negtweet, "ptweet": tcountp, "ntweet": tcountn}
-
-
-
-
-
+            "neglist": neglist, 'postweet': postweet, "negtweet": negtweet, "ptweet": tcountp, "ntweet": tcountn,"poswc":resobj.poswc,"negwc":resobj.negwc}
 
 def index(request):
 

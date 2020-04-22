@@ -127,13 +127,11 @@ class TwitterClient(object):
         if type == 0 :
             try:
                 for tweet in tweepy.Cursor(self.api.search, lang='en', count=100, q=query).items(count):
-                    print(i)
                     i = i + 1
                     msgs.append(tweet)
             except:
                 pass
             return msgs
-
 
     def simget_tweets(self, query,type=0, count=100):
 
@@ -423,9 +421,6 @@ def detailedanalysis(request):
             "neglist": neglist, 'postweet': postweet, "negtweet": negtweet, "ptweet": tcountp, "ntweet": tcountn,"poswc":resobj.poswc,"negwc":resobj.negwc}
 
 def index(request):
-
-    print(request.GET['hashtag'])
-    print(to_integer(datetime.now()))
     res=''
     if request.method == 'GET':
         reqtype = 0

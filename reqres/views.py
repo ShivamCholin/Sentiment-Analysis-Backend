@@ -346,23 +346,18 @@ def detailedanalysis(request):
             x = datetime.now().month
             y1 = datetime.now().year
             for key in range(countofdorm):
-                print(key)
-                print(x-key)
                 month1=x-key
-                print(month1)
                 year1 = y1
                 if month1 <= 0 :
                     year1 = y1 - 1
                     month1 += 12
                 dates1 = str(year1) + '-' + str(month1) + '-'
-                print(dates1)
                 tweetCriteria = got.manager.TweetCriteria().setQuerySearch(hashtag2) \
                     .setSince(dates1 + "01") \
                     .setUntil(dates1 + "28") \
                     .setMaxTweets(tweetcounting)
                 try:
                     tweetgot = got.manager.TweetManager.getTweets(tweetCriteria)
-                    print(len(tweetgot))
                     tweets = []
                     for tweet in tweetgot:
 

@@ -217,7 +217,7 @@ def simpleanalysis(request):
 
         else:
             hashtag2 = '#' + hashtag1
-            resobj = Searchres(hashtag='', time=0, positive=0, negative=0, tweetcount=0)
+            resobj = Searchres(hashtag='', time1=0, positive=0, negative=0, tweetcount=0)
             resobj.hashtag = hashtag1
             tweets = api.simget_tweets(query=hashtag2 ,type=0, count=tweetcounting)
             resobj.positive=0

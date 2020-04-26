@@ -1,6 +1,5 @@
 from django.db import models
 from django.core.files.storage import FileSystemStorage
-fs = FileSystemStorage(location='/media/photos')
 class Searchres(models.Model):
     hashtag=models.CharField(max_length=100)
     positive=models.FloatField(default=0)

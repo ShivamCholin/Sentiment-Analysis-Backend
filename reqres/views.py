@@ -277,7 +277,7 @@ def detailedanalysis(request):
             tweetcounting = int(request.GET['tcount'])
         except:
             pass
-        resobj = Detailed(hashtag=hashtag1, time=to_integer(datetime.now()), tweetcount=tweetcounting, dorm=dorm,countofdorm=countofdorm,positive=0,negative=0)
+        resobj = Detailed(hashtag=hashtag1, time1=to_integer(datetime.now()), tweetcount=tweetcounting, dorm=dorm,countofdorm=countofdorm,positive=0,negative=0)
         tcountp=0
         tcountn=0
         ttcount=0

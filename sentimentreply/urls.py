@@ -21,5 +21,5 @@ from reqres.views import index
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('reqres',index),
-    path('hello',indexhello)
+    path('',indexhello)
 ]

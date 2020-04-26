@@ -22,7 +22,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='detailed',
-            name='time',
+            name='time1',
             field=models.PositiveIntegerField(default=0),
         ),
         migrations.AddField(

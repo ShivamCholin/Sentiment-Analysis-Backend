@@ -66,7 +66,7 @@ def to_dictsim(x):
         l1.append(x.negtweet2)
     except:
         pass
-    y = {"hashtag": x.hashtag, 'positive':x.positive,'negative':x.negative,'negtweet':l1,'postweet':l2,'tweetcount':x.tweetcount,"time":x.time,"poswc":x.poswc,"negwc":x.negwc}
+    y = {"hashtag": x.hashtag, 'positive':x.positive,'negative':x.negative,'negtweet':l1,'postweet':l2,'tweetcount':x.tweetcount,"time":x.time1,"poswc":x.poswc,"negwc":x.negwc}
     return y
 #resobj = Searchres(hashtag='',time=0,positive=0,negative=0,postweet=[],negtweet=[],tweetcount=0)
 #detres = Detailed(hashtag='',poslist = [],neglist = [],postweet = [],negtweet = [],tweetcountl=0,dorm=0,countofdorm=0,label=[])
@@ -207,7 +207,7 @@ def simpleanalysis(request):
             if searchress[i].hashtag == hashtag1:
                 j = i
                 time1 = int(to_integer(datetime.now()))
-                diff = time1 - searchress[j].time
+                diff = time1 - searchress[j].time1
                 if diff >= 1:
                     j = -1
                 break
@@ -257,7 +257,7 @@ def simpleanalysis(request):
                     resobj.negtweet2 = ntweets[len(ntweets) - 2]['status']
                 except:
                     pass
-            resobj.time = to_integer(datetime.now())
+            resobj.time1 = to_integer(datetime.now())
             resobj.tweetcount = len(tweets)
             resobj.save()
             return to_dictsim(resobj)
@@ -417,7 +417,7 @@ def detailedanalysis(request):
             resobj.negwc = word_cloud(ntext)
             resobj.save()
             return {"hashtag": hashtag1, 'positive': resobj.positive, 'negative': resobj.negative,
-            'tweetcount': ttcount, "time": resobj.time, "label": label, "count": count, "poslist": poslist,
+            'tweetcount': ttcount, "time": resobj.time1, "label": label, "count": count, "poslist": poslist,
             "neglist": neglist, 'postweet': postweet, "negtweet": negtweet, "ptweet": tcountp, "ntweet": tcountn,"poswc":resobj.poswc,"negwc":resobj.negwc}
 
 def index(request):

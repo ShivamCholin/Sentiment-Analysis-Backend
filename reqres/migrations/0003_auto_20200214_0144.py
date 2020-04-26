@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterField(
             model_name='searchres',
-            name='time',
+            name='time1',
             field=models.IntegerField(default=0),
         ),
     ]

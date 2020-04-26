@@ -10,7 +10,7 @@ class Searchres(models.Model):
     negtweet1 = models.CharField(max_length=1000, default='')
     negtweet2 = models.CharField(max_length=1000, default='')
     tweetcount=models.IntegerField(default=1000)
-    time=models.PositiveIntegerField(default=0)
+    time1=models.PositiveIntegerField(default=0)
     poswc = models.CharField(max_length=10000000, default='')
     negwc = models.CharField(max_length=10000000, default='')
 
@@ -21,6 +21,6 @@ class Detailed(models.Model):
     dorm = models.PositiveIntegerField(default=0)
     countofdorm = models.PositiveIntegerField(default=0)
     tweetcount = models.IntegerField(default=1000)
-    time=models.PositiveIntegerField(default=0)
+    time1=models.PositiveIntegerField(default=0)
     poswc = models.CharField(max_length=10000000, default='')
     negwc = models.CharField(max_length=10000000, default='')

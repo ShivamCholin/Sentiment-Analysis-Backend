@@ -22,7 +22,7 @@ class Migration(migrations.Migration):
                 ('positweet2', models.CharField(max_length=2083)),
                 ('negitweet1', models.CharField(max_length=2083)),
                 ('negitweet2', models.CharField(max_length=2083)),
-                ('time', models.DateTimeField()),
+                ('time1', models.DateTimeField()),
             ],
         ),
     ]

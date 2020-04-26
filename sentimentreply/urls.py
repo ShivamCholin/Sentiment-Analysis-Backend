@@ -15,8 +15,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from deploytest.views import indexhello
+from reqres.views import index
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('reqres',include('reqres.urls')),
+    path('reqres',index),
+    path('hello',indexhello)
 ]

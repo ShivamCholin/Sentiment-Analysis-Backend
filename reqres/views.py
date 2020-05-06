@@ -202,7 +202,7 @@ def simpleanalysis(request):
         except:
             pass
         j = -1
-        searchress = Searchres.objects.all().order_by('-time')
+        searchress = Searchres.objects.all().order_by('-time1')
         for i in range(0, searchress.count()):
             if searchress[i].hashtag == hashtag1:
                 j = i

@@ -15,6 +15,7 @@ import io
 import base64
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 analyser = SentimentIntensityAnalyzer()
+import os
 
 def word_cloud(text):
     try:
@@ -104,11 +105,10 @@ class TwitterClient(object):
 
     def __init__(self):
 
-        consumer_key = "iSTzjPhjpdK7nE1WPKYgdShJd"
-        consumer_secret = "ZSc7Bl4SiA2weDzcUPkRI0x6XoeoxgATvRHWEjeIp4FTVteJa9"
-        access_token = "793737675115081728-LRNkTeuTkz8ktnAhc78nkg1SHrlgvAa"
-        access_token_secret = "4bG3rsxY0wMJIZxf3uf6xraiwUdB1YffbdbJFrMyWBLVa"
-
+        consumer_key = os.environ.get('consumer_key')
+        consumer_secret = os.environ.get('consumer_secret')
+        access_token = os.environ.get('access_token')
+        access_token_secret = os.environ.get('access_token_secret')
 
         try:
 
